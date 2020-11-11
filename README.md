@@ -42,7 +42,7 @@ Alternatively, a requirements.txt file has been provided, and so you can create 
 >
 > pip install -r requirements.txt
 
-This app was tested in python 3.8.3, it should work for all python 3+ versions.
+This app was tested in python 3.8.3, but it should work for all python 3+ versions.
 
 ### Tips
 
