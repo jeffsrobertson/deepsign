@@ -50,7 +50,7 @@ class ASLWebCam:
 
         self.word = 'no_gesture'
         self.outline_img = cv.imread('app/static/outline.png')
-        
+
         self.next_guess_time = 0
         self.guess_message = ''
         self.guess_color = (255, 255, 255)
@@ -174,7 +174,7 @@ class ASLWebCam:
     def draw_frame(self, frame):
 
         # Draw frame
-        height, width, _ = frame.shape
+        height,  width, _ = frame.shape
 
         # Add body outline, grey out region of frame outside it
         frame = cv.addWeighted(src1=frame, alpha=1., src2=self.outline_img, beta=0.1, gamma=0)
@@ -294,10 +294,10 @@ class ASLWebCam:
             self.update_guess_word()
             return
         new_word = np.random.choice(list_of_words)
-        print('guessed words: {}. new_words: {}'.format(self.already_guessed_words, list_of_words))
+        
         self.word = new_word
         self.allow_tally_reward = True
-        print('New word: {}'.format(self.word))
+        print('>> New word: {}'.format(self.word))
 
     # Calculates the moving-average fps
     def calc_fps(self, current_time):
@@ -331,6 +331,7 @@ class ASLWebCam:
             # Freeze up main thread until the webcam has had time to close
             while self.cap.isOpened():
                 continue
+            self.already_guessed_words = []
             self.sampled_frames = []
             self.sampled_times = []
             self.guess_message = ''
