@@ -1,7 +1,7 @@
 import threading
 import time
 import numpy as np
-from .model.mobilenetv2 import MobileNetV2
+from deepsign.model.mobilenetv2 import MobileNetV2
 import torch
 from scipy import interpolate
 from collections import OrderedDict
@@ -22,7 +22,7 @@ class ASLWebCam:
                       'grandmother': 10, 'happy': 11, 'house': 12,
                       'no_gesture': 13, 'please': 14, 'tired': 15}
         self.inv_codex = {v: k for k, v in self.codex.items()}
-        self.model_path = 'app/model/asl_model.pth'
+        self.model_path = 'deepsign/model/asl_model.pth'
 
         self.current_frame = None
 
@@ -49,7 +49,7 @@ class ASLWebCam:
         self.model = self.load_model()
 
         self.word = 'no_gesture'
-        self.outline_img = cv.imread('app/static/outline.png')
+        self.outline_img = cv.imread('deepsign/static/outline.png')
 
         self.next_guess_time = 0
         self.guess_message = ''
@@ -279,7 +279,7 @@ class ASLWebCam:
         if self.current_frame is not None:
             img = cv.imencode('.png', self.current_frame)[1].tobytes()
         else:
-            with open("app/static/not_found.jpeg", "rb") as f:
+            with open("deepsign/static/not_found.jpeg", "rb") as f:
                 img = f.read()
         return img
 
@@ -565,7 +565,7 @@ class JesterWebCam:
         if self.current_frame is not None:
             img = cv.imencode('.png', self.current_frame)[1].tobytes()
         else:
-            with open("app/static/not_found.jpeg", "rb") as f:
+            with open("deepsign/static/not_found.jpeg", "rb") as f:
                 img = f.read()
         return img
 
@@ -580,14 +580,14 @@ class JesterWebCam:
         print('>> Loading pytorch neural network.')
         model = MobileNetV2(num_classes=len(self.codex), sample_size=112, width_mult=1.)
         if not torch.cuda.is_available():
-            full_filepath = os.path.join(os.getcwd(), 'app/model/gesture_model.pth')
+            full_filepath = os.path.join(os.getcwd(), 'deepsign/model/gesture_model.pth')
             loaded_state_dict = torch.load(full_filepath, map_location=torch.device('cpu'))
             state_dict = OrderedDict()
             for k, v in loaded_state_dict.items():
                 state_dict[k[7:]] = v
         else:
             print('>> CUDA detected, running neural network on GPU')
-            state_dict = torch.load('app/model/gesture_model.pth')
+            state_dict = torch.load('deepsign/model/gesture_model.pth')
         model.load_state_dict(state_dict)
         model.eval()
 
