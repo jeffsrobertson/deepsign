@@ -60,7 +60,7 @@ class ASLWebCam:
 
         self._base_fontscale = 1.
 
-        print('>> Initialized webcam')
+        print('>> Initialized ASL webcam')
 
     def _capture_loop(self):
 
@@ -130,10 +130,9 @@ class ASLWebCam:
 
 
     def load_model(self):
-        print('>> Loading pytorch neural network.')
         model = MobileNetV2(num_classes=len(self.codex), sample_size=112, width_mult=1.)
         if not torch.cuda.is_available():
-            print('>> No CUDA detected, loading model onto CPU')
+            print('>> ASLWebCam: No CUDA detected - loading neural network onto CPU.')
             full_filepath = os.path.join(os.getcwd(), self.model_path)
             loaded_state_dict = torch.load(full_filepath, map_location=torch.device('cpu'))['state_dict']
             state_dict = OrderedDict()
@@ -145,7 +144,7 @@ class ASLWebCam:
                 else:
                     state_dict[k[7:]] = v
         else:
-            print('>> CUDA detected, running neural network on GPU')
+            print('>> ASLWebCam: CUDA detected - loading neural network onto GPU.')
             state_dict = torch.load(self.model_path)
         model.load_state_dict(state_dict)
         model.eval()
@@ -414,7 +413,7 @@ class JesterWebCam:
 
         self._base_fontscale = 1.
 
-        print('>> Initialized webcam')
+        print('>> Initialized Jester webcam')
 
     def _capture_loop(self):
 
@@ -524,23 +523,23 @@ class JesterWebCam:
             prob_printout = ''
         else:
             prob_printout = self.predicted_word+' ('+str(round(self.predicted_word_prob))+'%)'
-        
+
         # Add last gesture prediction
-        cv.putText(img=frame, 
+        cv.putText(img=frame,
                    text='Last gesture: '+prob_printout,
-                   org=(int(.01*width), int(.99*height)), 
+                   org=(int(.01*width), int(.99*height)),
                    fontFace=cv.FONT_HERSHEY_SIMPLEX,
-                   fontScale=1.5*self._base_fontscale, 
-                   color=(255, 0, 255), 
+                   fontScale=1.5*self._base_fontscale,
+                   color=(255, 0, 255),
                    thickness=3)
 
         return frame
 
     def turn_on(self):
-        
+
         self.cap = cv.VideoCapture(0)
         self.turned_on = True
-        
+
         # Initialize font sizes to be proportional to height of video
         cap_height = self.cap.get(cv.CAP_PROP_FRAME_HEIGHT)
         self._base_fontscale = cap_height/720.
@@ -557,7 +556,7 @@ class JesterWebCam:
             # Freeze up main thread until the webcam has had time to close
             while self.cap.isOpened():
                 continue
-            
+
             self.__init__()
 
     def get_frame(self):
@@ -577,23 +576,21 @@ class JesterWebCam:
         self.fps_list.pop(0)
 
     def load_model(self):
-        print('>> Loading pytorch neural network.')
         model = MobileNetV2(num_classes=len(self.codex), sample_size=112, width_mult=1.)
         if not torch.cuda.is_available():
+            print('>> JesterWebCam: No CUDA detected - loading neural network onto CPU.')
             full_filepath = os.path.join(os.getcwd(), 'deepsign/model/gesture_model.pth')
             loaded_state_dict = torch.load(full_filepath, map_location=torch.device('cpu'))
             state_dict = OrderedDict()
             for k, v in loaded_state_dict.items():
                 state_dict[k[7:]] = v
         else:
-            print('>> CUDA detected, running neural network on GPU')
+            print('>> JesterWebCam: CUDA detected - loading neural network onto GPU.')
             state_dict = torch.load('deepsign/model/gesture_model.pth')
         model.load_state_dict(state_dict)
         model.eval()
 
         return model
-
-
 
 
 
