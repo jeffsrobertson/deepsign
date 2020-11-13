@@ -1,6 +1,6 @@
 from flask import Flask, render_template, url_for, Response
 from flask import request, redirect
-from .camera import *
+from deepsign.camera import ASLWebCam, JesterWebCam
 
 app = Flask(__name__)
 asl_cam = ASLWebCam()
@@ -57,14 +57,16 @@ def gestures():
 
 @app.route("/gestures_webcam", methods=['GET', 'POST'])
 def gestures_webcam():
-        if request.method == 'GET':
-            return redirect(url_for('gestures'))
-        else:
-            jester_cam.turn_on()
-            lexicon = list(set(jester_cam.codex.keys()))
-            lexicon.sort()
-            lexicon = [word for word in lexicon if ((word != 'no gesture') and (word != ''))]
-            return render_template('gestures_webcam.html', title='Gesture Recognition', lexicon=lexicon)
+    if request.method == 'GET':
+        return redirect(url_for('gestures'))
+    else:
+        jester_cam.turn_on()
+        lexicon = list(set(jester_cam.codex.keys()))
+        lexicon.sort()
+        lexicon = [word for word in lexicon if word not in ('no gesture', '')]
+        return render_template('gestures_webcam.html',
+                               title='Gesture Recognition',
+                               lexicon=lexicon)
 
 
 @app.route("/about")
@@ -76,17 +78,17 @@ def gen(cam):
     while cam.turned_on:
         frame = cam.get_frame()
         a = (b'--frame\r\n'
-               b'Content-Type: image/png\r\n\r\n' + frame + b'\r\n')
+             b'Content-Type: image/png\r\n\r\n' + frame + b'\r\n')
         yield a
 
 
 @app.route("/video_feed_asl")
 def video_feed_asl():
     return Response(gen(asl_cam),
-        mimetype="multipart/x-mixed-replace; boundary=frame")
+                    mimetype="multipart/x-mixed-replace; boundary=frame")
 
 
 @app.route("/video_feed_gesture")
 def video_feed_gesture():
     return Response(gen(jester_cam),
-        mimetype="multipart/x-mixed-replace; boundary=frame")
+                    mimetype="multipart/x-mixed-replace; boundary=frame")
