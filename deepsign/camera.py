@@ -306,12 +306,13 @@ class ASLWebCam:
         self.fps_list.pop(0)
 
     def turn_on(self):
-        self.cap = cv.VideoCapture(-1)
+        self.cap = cv.VideoCapture(0)
         self.turned_on = True
 
         # Resize body outline img to match user's webcam output
         cap_width = self.cap.get(cv.CAP_PROP_FRAME_WIDTH)
         cap_height = self.cap.get(cv.CAP_PROP_FRAME_HEIGHT)
+        print('CAP HEIGHT, WIDTH = {},{}'.format(cap_height, cap_width))
         if self.outline_img.shape[0:2] != (cap_height, cap_width):
             self.resize_outline((cap_height, cap_width))
 
