@@ -293,7 +293,7 @@ class ASLWebCam:
             self.update_guess_word()
             return
         new_word = np.random.choice(list_of_words)
-        
+
         self.word = new_word
         self.allow_tally_reward = True
         print('>> New word: {}'.format(self.word))
@@ -306,7 +306,7 @@ class ASLWebCam:
         self.fps_list.pop(0)
 
     def turn_on(self):
-        self.cap = cv.VideoCapture(0)
+        self.cap = cv.VideoCapture(-1)
         self.turned_on = True
 
         # Resize body outline img to match user's webcam output
